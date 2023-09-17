@@ -2,62 +2,53 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [list, setList] = useState([]);
-  const [undid, setUndid] = useState([]);
-
-  const handleClick = (event) => {
-    const newDot = {
-      clientX: event.clientX,
-      clientY: event.clientY,
-    };
-
-    console.log(newDot);
-    setList((prev) => [...prev, newDot]);
-    setUndid([]);
-  };
+  const [list, setList] = useState([])
+  const [removed, setRemoved] = useState([])
 
   const handleUndo = (event) => {
     event.stopPropagation();
-    console.log('undo');
-
-    if (list.length === 0) {
+    if (list.length === 0){
       return;
     }
-
-    const lastItem = list[list.length - 1];
-    setUndid((prev) => [...prev, lastItem]);
-
+    const lastPosition = list[list.length -1 ]
+    setRemoved((prev)=>[...prev, lastPosition])
+    
     setList((prev) => {
       const newArr = [...prev].slice(0, -1);
       return newArr;
     });
-  };
-
+  }
   const handleRedo = (event) => {
-    event.stopPropagation();
 
-    if (undid.length === 0) {
+    event.stopPropagation();
+    if (removed.length === 0){
       return;
     }
+    const recovery = removed[removed.length -1]
 
-    const recoveredDot = undid[undid.length - 1];
-    setUndid((prev) => {
-      const newArr = [...prev].slice(0, -1);
-      return newArr;
-    });
-    setList((prev) => [...prev, recoveredDot]);
-  };
+    setRemoved((prev)=> {
+      const newArray = [...prev].slice(0,-1)
+      return newArray
+    })
+    setList((prev)=>[...prev, recovery])
 
+  }
+  const handleClick = (event) => {
+    const position = {
+      positionX : event.clientX,
+      positionY : event.clientY
+    }
+    // adiciona no que ja existe
+    setList((prev)=>[...prev, position])
+    setRemoved([])
+  }
+  
   return (
     <div id='page' onClick={handleClick}>
       <button onClick={handleUndo}>Desfazer</button>
       <button onClick={handleRedo}>Refazer</button>
-      {list.map((item, index) => (
-        <span
-          key={index}
-          className='dot'
-          style={{ left: item.clientX, top: item.clientY }}
-        />
+      {list.map((item,index)=>(
+        <span key={index} className='dot' style={{top : item.positionY, left : item.positionX}}/>
       ))}
     </div>
   );
